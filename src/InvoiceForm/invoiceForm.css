@@ -1,0 +1,45 @@
+.ui-invoice-form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 3%;
+}
+.app-back{
+    background-color: rgb(218, 216, 198);
+    height: 100vh;
+}
+.ui-row{
+    display: flex;
+    flex-direction: row;
+}
+
+.ui-textfield{
+    width: 300px;
+}
+
+.ui-heading{
+    font-size: 25px;
+    font-weight: 600;
+    text-align: center;
+}
+.ui-submit{
+    background-color: black;
+    color: white;
+    margin-top: 5%;
+    width: 10%;
+}
+.ui-submit:hover{
+    background-color: rgb(87, 87, 87);
+    box-shadow: grey;
+}
+
+.ui-tabs{
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.ui-table-head{
+    font-size: 18px;
+    font-weight: 600;
+}

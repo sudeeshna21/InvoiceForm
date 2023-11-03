@@ -1,9 +1,8 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import './invoiceForm.css';
-import { Typography } from '@mui/material';
 
 // : Qty, Cost Price, Margin %, Margin, Sales Price, Total Sales Price,
 //  Discount %, Discount, Tax %, Tax, and Final Sales Price
@@ -24,47 +23,53 @@ const InvoiceForm = ({addInvoice, setValue}) => {
         finalSalesPrice: 0
       });
     
-      const calculateValues = () => {
-        const { qty, costPrice, marginPercentage, discountPercentage, taxPercentage } = formValues;
-        
-        const salesPrice = qty * costPrice;
-        const totalSalesPrice = qty * salesPrice;
-        const margin = (marginPercentage / 100) * salesPrice;
-        const discount = (totalSalesPrice * (discountPercentage / 100));
-        const tax = (totalSalesPrice * (taxPercentage / 100));
-        const finalSalesPrice = totalSalesPrice - discount + tax;
-    
-        return {
-          salesPrice,
-          totalSalesPrice,
-          margin,
-          discount,
-          tax,
-          finalSalesPrice
-        };
-      };
-
       const handleInputChange = (field, value) => {
-        setFormValues({
-          ...formValues,
-          [field]: value,
-        });
+        let updatedValues = { ...formValues, [field]: value };
+      
+        switch (field) {
+          case 'costPrice':
+          case 'marginPercentage':
+            updatedValues.margin = (Number(updatedValues.costPrice) * Number(updatedValues.marginPercentage)) / 100;
+            updatedValues.salesPrice = Number(updatedValues.costPrice) + (Number(updatedValues.costPrice) * Number(updatedValues.marginPercentage) / 100);
+            updatedValues.totalSalesPrice = Number(updatedValues.costPrice) * Number(updatedValues.qty);
+            updatedValues.finalSalesPrice = Number(updatedValues.totalSalesPrice) - Number(updatedValues.discount) + Number(updatedValues.tax) ;
+            break;
+          case 'margin':
+            updatedValues.marginPercentage = (Number(updatedValues.margin) / Number(updatedValues.costPrice)) * 100;
+            updatedValues.salesPrice = Number(updatedValues.costPrice) + Number(updatedValues.margin);
+            updatedValues.totalSalesPrice = Number(updatedValues.costPrice) * Number(updatedValues.qty);
+            updatedValues.finalSalesPrice = Number(updatedValues.totalSalesPrice) - Number(updatedValues.discount) + Number(updatedValues.tax) ;
+            break;
+          case 'totalSalesPrice':
+          case 'discountPercentage':
+            updatedValues.discount = (Number(updatedValues.totalSalesPrice) * Number(updatedValues.discountPercentage)) / 100;
+            updatedValues.finalSalesPrice = Number(updatedValues.totalSalesPrice) - Number(updatedValues.discount) + Number(updatedValues.tax) ;
+            break;
+          case 'discount':
+            updatedValues.discountPercentage = (Number(updatedValues.discount) / Number(updatedValues.totalSalesPrice)) * 100;
+            updatedValues.finalSalesPrice = Number(updatedValues.totalSalesPrice) - Number(updatedValues.discount) + Number(updatedValues.tax) ;
+            break;
+          case 'taxPercentage':
+            updatedValues.tax = (Number(updatedValues.totalSalesPrice) * Number(updatedValues.taxPercentage)) / 100;
+            updatedValues.finalSalesPrice = Number(updatedValues.totalSalesPrice) - Number(updatedValues.discount) + Number(updatedValues.tax) ;
+            break;
+          case 'tax':
+            updatedValues.taxPercentage = (Number(updatedValues.tax) / Number(updatedValues.totalSalesPrice)) * 100;
+            updatedValues.finalSalesPrice = Number(updatedValues.totalSalesPrice) - Number(updatedValues.discount) + Number(updatedValues.tax) ;
+            break;
+          default:
+            break;
+        }
+      
+        setFormValues(updatedValues);
       };
-    
-      useEffect(() => {
-        const calculatedValues = calculateValues();
-        setFormValues({
-          ...formValues,
-          ...calculatedValues
-        });
-      }, [formValues.qty, formValues.costPrice, formValues.marginPercentage, formValues.discountPercentage, formValues.taxPercentage]);
+      
 
     
       const handleFormSubmit = (e) => {
         e.preventDefault();
         const newInvoice = {
           ...formValues,
-          ...calculateValues()
         };
         addInvoice(newInvoice);
         setValue(1)
